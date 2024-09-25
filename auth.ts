@@ -1,41 +1,39 @@
 import express, { Response, Request, NextFunction } from 'express';
-import pgPromise from 'pg-promise';
 import passport from 'passport';
 import LocalStrategy from 'passport-local';
 import crypto from 'crypto';
 import session from 'express-session';
 import pgStore from 'connect-pg-simple';
+import { dbOBJ, useDB, GetUserData, CheckIfUserExists, InsertIntoUsers } from './dbManager';
 import env from './config';
 
-const pgp = pgPromise();
-
-const db = pgp(env.DB)
 
 const Store = pgStore(session);
 
 const router = express.Router();
 
-passport.use(new LocalStrategy.Strategy((username, password, cb) => {
+passport.use(new LocalStrategy.Strategy(async (username, password, cb) => {
 
-    db.one('SELECT * FROM users WHERE username = $1', username).then(
 
-        (data: Express.User) => {
+    const user = await useDB(GetUserData, username) as Express.User;
+    if (user) {
+        crypto.pbkdf2(password, user.salt, 310000, 16, 'sha256', (err, hashResult) => {
 
-            crypto.pbkdf2(password, data.salt, 310000, 16, 'sha256', (err, hashResult) => {
+            if (crypto.timingSafeEqual(user.hashed_password, hashResult)) {
 
-                if (crypto.timingSafeEqual(data.hashed_password, hashResult)) {
+                return cb(null, user, { message: 'user ' + user.username + ' logged in succesfully' });
+            } else {
 
-                    return cb(null, data, { message: 'user ' + data.username + ' logged in succesfully' });
-                } else {
+                return cb(new Error('incorrect password'), false, { message: 'incorrect password' });
+            }
+        })
 
-                    return cb(new Error('incorrect password'), false, { message: 'incorrect password' });
-                }
-            })
-        }
-    ).catch(() => {
-
+    } else {
         return cb(new Error('username does not exist'), false, { message: "username does not exist" });
-    })
+    }
+    
+
+
 }))
 
 router.use(
@@ -49,7 +47,7 @@ router.use(
             httpOnly: true
         },
         store: new Store({
-            pgPromise: db,
+            pgPromise: dbOBJ,
             tableName: 'session'
         })
     })
@@ -104,12 +102,10 @@ router.post('/auth', (req, res, next) => {
     passport.authenticate('local', (err: Error, user: Express.User, info: LocalStrategy.IVerifyOptions) => {
 
         if (err) {
-            console.log(err.message)
             return next(err);
         }
 
         if (!user) {
-            console.log(info.message)
             return next(err);
         }
 
@@ -127,42 +123,34 @@ router.post('/auth', (req, res, next) => {
 
 });
 
-router.post('/addUser', (req, res, next) => {
+router.post('/addUser', async (req, res, next) => {
 
     if (!req.body) {
         console.log(req.body)
-        return res.status(401).json({ message: 'no user was sent' })
+        return res.status(401).json({ message: 'no user was sent' });
     }
 
     //check to see if user already exists
-    db.one('SELECT COUNT(username) FROM users WHERE username = $1', req.body?.username).then((response) => {
+    const response = await useDB(CheckIfUserExists, req.body.username, next);
 
-        // if user already exists
-        if (response.count === '1') {
-            return next(new Error('user already exists'));
-        }
+    if (response === true) {
+        return next(new Error('user already exists'));
+    }
 
-        //add new user
-        if (req.body) {
-            const salt = crypto.randomBytes(16)
+    //add new user
+    const salt = crypto.randomBytes(16);
+    crypto.pbkdf2(req.body?.password, salt, 310000, 16, 'sha256', async (err, hashResult) => {
+        const user: Express.User = { username: req.body.username, salt: salt, hashed_password: hashResult, password: req.body.password, user_id: 0 }
 
-            crypto.pbkdf2(req.body?.password, salt, 310000, 16, 'sha256', (err, hashResult) => {
+        await useDB(InsertIntoUsers, user, next);
 
-                db.none('INSERT INTO users (username, hashed_password, salt) VALUES ($1, $2, $3)', [req.body?.username, hashResult, salt]).then(() => {
-                    console.log('user added to db');
+    })
 
-                    req.logIn(req.body, () => {
-                        return res.status(200).json({ message: 'Signed up successfully' })
-                    })
+    console.log('user added to db');
 
-
-                }).catch((err) => { return next(err) });
-
-            })
-        }
-
-    }).catch((err) => { return next(err) }
-    )
+    req.logIn(req.body, () => {
+        return res.status(200).json({ message: 'Signed up successfully' })
+    })
 
     //return res.status(500);
 })

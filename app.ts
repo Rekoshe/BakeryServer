@@ -1,14 +1,14 @@
 import express, { Response, Request, NextFunction } from 'express';
-import pgPromise from 'pg-promise';
+
 import bodyParser from 'body-parser';
 import authRouter from './auth';
-import env from './config'
+import { DeleteFromDataSent, InsertIntoDataSent, useDB } from './dbManager';
 
 
-const pgp = pgPromise();
+
 
 const app = express()
-const db = pgp(env.DB)
+
 
 const port = 4000
 
@@ -29,47 +29,28 @@ app.use(logger);
 
 app.use(authRouter);
 
-app.post('/', (req, res) => {
-
-  db.none('INSERT INTO dataSent (value_string) VALUES($1)', req.body.name).then(
-    () => {
-      console.log(req.body.name + " has been added to the dataBase");
-    }
-  ).catch(error => {
-    console.log(error)
-  })
 
 
-  res.end();
+app.post('/', async (req, res, next) => {
+
+  await useDB(InsertIntoDataSent, req.body.name, next);
+
+  res.status(201).json({ message: 'data added successfully' });
 
 })
 
-app.post('/delete', (req, res) => {
-  db.none('DELETE FROM dataSent WHERE data_id = $1', req.body.data_id).then(
-    () => {
-      console.log(req.body.value_string + " has been deleted from the database");
-    }
-  ).catch((e) => {
-    console.log(e);
-  })
+app.post('/delete', async (req, res, next) => {
 
-  res.end();
+  await useDB(DeleteFromDataSent, req.body.value_string, next);
+
+  res.status(200).json({ message: 'data deleted successfully' });
+
 })
-
-
-
-
 
 
 app.get('/dataItems', (req, res) => {
 
-  db.any('SELECT * FROM dataSent').then((data) => {
-
-    res.send(data);
-  }).catch((e) => {
-
-    console.log(e);
-  })
+  res.send([]);
 
 })
 
