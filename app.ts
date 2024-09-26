@@ -2,6 +2,7 @@ import express, { Response, Request, NextFunction } from 'express';
 
 import bodyParser from 'body-parser';
 import authRouter from './auth';
+import jwtRouter from './jwt';
 import { DeleteFromDataSent, InsertIntoDataSent, useDB } from './dbManager';
 
 
@@ -27,7 +28,7 @@ app.use(bodyParser.json());
 
 app.use(logger);
 
-app.use(authRouter);
+app.use(jwtRouter);
 
 
 

@@ -4,7 +4,7 @@ import LocalStrategy from 'passport-local';
 import crypto from 'crypto';
 import session from 'express-session';
 import pgStore from 'connect-pg-simple';
-import { dbOBJ, useDB, GetUserData, CheckIfUserExists, InsertIntoUsers } from './dbManager';
+import { dbOBJ, useDB, GetUserData, CheckIfUserExists, InsertIntoUsers, VerifyUserPassword } from './dbManager';
 import env from './config';
 
 
@@ -12,29 +12,25 @@ const Store = pgStore(session);
 
 const router = express.Router();
 
-passport.use(new LocalStrategy.Strategy(async (username, password, cb) => {
+//strategy for basic username password verification
+export const localStrategy = new LocalStrategy.Strategy(async (username, password, cb) => {
 
+    try {
+        const exists = await useDB(VerifyUserPassword, { username, password }) as boolean;
 
-    const user = await useDB(GetUserData, username) as Express.User;
-    if (user) {
-        crypto.pbkdf2(password, user.salt, 310000, 16, 'sha256', (err, hashResult) => {
+        if (exists === true) {
+            return cb(false, { username, password })
+        } else {
+            return cb(new Error('incorrect password'), false);
+        }
 
-            if (crypto.timingSafeEqual(user.hashed_password, hashResult)) {
-
-                return cb(null, user, { message: 'user ' + user.username + ' logged in succesfully' });
-            } else {
-
-                return cb(new Error('incorrect password'), false, { message: 'incorrect password' });
-            }
-        })
-
-    } else {
-        return cb(new Error('username does not exist'), false, { message: "username does not exist" });
+    } catch (e) {
+        return cb(e, false);
     }
-    
 
+})
 
-}))
+passport.use(localStrategy)
 
 router.use(
     session({
@@ -138,13 +134,8 @@ router.post('/addUser', async (req, res, next) => {
     }
 
     //add new user
-    const salt = crypto.randomBytes(16);
-    crypto.pbkdf2(req.body?.password, salt, 310000, 16, 'sha256', async (err, hashResult) => {
-        const user: Express.User = { username: req.body.username, salt: salt, hashed_password: hashResult, password: req.body.password, user_id: 0 }
+    await useDB(InsertIntoUsers, req.body, next);
 
-        await useDB(InsertIntoUsers, user, next);
-
-    })
 
     console.log('user added to db');
 
