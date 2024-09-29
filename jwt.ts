@@ -4,6 +4,7 @@ import { localStrategy } from './auth';
 import passportJwt, { Strategy, ExtractJwt, VerifiedCallback, VerifyCallback } from 'passport-jwt';
 import env from './config'
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { CheckIfUserExists, InsertIntoUsers, useDB } from './dbManager';
 
 const router = express.Router();
 
@@ -84,7 +85,30 @@ router.post('/logOut', (req, res, next) => {
     res.status(500);
 });
 
+router.post('/addUser', async (req, res, next) => {
 
+    if (!req.body) {
+        console.log(req.body)
+        return res.status(401).json({ message: 'no user was sent' });
+    }
+
+    //check to see if user already exists
+    const response = await useDB(CheckIfUserExists, req.body.username, next);
+
+    if (response === true) {
+        return next(new Error('user already exists'));
+    }
+
+    //add new user
+    await useDB(InsertIntoUsers, req.body, next);
+
+
+    console.log('user added to db');
+
+    res.status(200).json({message: 'user added successfully'});
+
+    //return res.status(500);
+})
 
 export default router;
 
