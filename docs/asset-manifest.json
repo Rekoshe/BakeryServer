@@ -1,21 +1,21 @@
 {
   "files": {
-    "main.css": "/docs/static/css/main.a5bebe34.css",
-    "main.js": "/docs/static/js/main.6e302877.js",
-    "static/js/582.7bdd35f4.chunk.js": "/docs/static/js/582.7bdd35f4.chunk.js",
-    "static/js/453.de1d0d5a.chunk.js": "/docs/static/js/453.de1d0d5a.chunk.js",
-    "static/js/596.8f02a348.chunk.js": "/docs/static/js/596.8f02a348.chunk.js",
-    "static/media/loading.gif": "/docs/static/media/loading.3cbdaee9bc31418848f2.gif",
-    "static/media/nodejs-logo.svg": "/docs/static/media/nodejs-logo.6b9a3e4637692a75867604a712360fda.svg",
-    "index.html": "/docs/index.html",
-    "main.a5bebe34.css.map": "/docs/static/css/main.a5bebe34.css.map",
-    "main.6e302877.js.map": "/docs/static/js/main.6e302877.js.map",
-    "582.7bdd35f4.chunk.js.map": "/docs/static/js/582.7bdd35f4.chunk.js.map",
-    "453.de1d0d5a.chunk.js.map": "/docs/static/js/453.de1d0d5a.chunk.js.map",
-    "596.8f02a348.chunk.js.map": "/docs/static/js/596.8f02a348.chunk.js.map"
+    "main.css": "/BakeryServer/docs/static/css/main.a5bebe34.css",
+    "main.js": "/BakeryServer/docs/static/js/main.5ab3353a.js",
+    "static/js/582.7bdd35f4.chunk.js": "/BakeryServer/docs/static/js/582.7bdd35f4.chunk.js",
+    "static/js/453.de1d0d5a.chunk.js": "/BakeryServer/docs/static/js/453.de1d0d5a.chunk.js",
+    "static/js/596.9edde87f.chunk.js": "/BakeryServer/docs/static/js/596.9edde87f.chunk.js",
+    "static/media/loading.gif": "/BakeryServer/docs/static/media/loading.3cbdaee9bc31418848f2.gif",
+    "static/media/nodejs-logo.svg": "/BakeryServer/docs/static/media/nodejs-logo.6b9a3e4637692a75867604a712360fda.svg",
+    "index.html": "/BakeryServer/docs/index.html",
+    "main.a5bebe34.css.map": "/BakeryServer/docs/static/css/main.a5bebe34.css.map",
+    "main.5ab3353a.js.map": "/BakeryServer/docs/static/js/main.5ab3353a.js.map",
+    "582.7bdd35f4.chunk.js.map": "/BakeryServer/docs/static/js/582.7bdd35f4.chunk.js.map",
+    "453.de1d0d5a.chunk.js.map": "/BakeryServer/docs/static/js/453.de1d0d5a.chunk.js.map",
+    "596.9edde87f.chunk.js.map": "/BakeryServer/docs/static/js/596.9edde87f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.a5bebe34.css",
-    "static/js/main.6e302877.js"
+    "static/js/main.5ab3353a.js"
   ]
 }
