@@ -36,3 +36,41 @@
     transform: rotate(360deg);
   }
 }
+
+.APIbutton {
+  border: none;
+  height: 5vw;
+  width: 20vw;
+  font-size: 2vw;
+  background-color: #61DAFB;
+  display: block;
+  margin: 0.3vw;
+  
+}
+
+.APIbutton:active {
+  background-color: #163139;
+}
+
+.inputField {
+  height: 4vw;
+  width: 20vw;
+  margin-bottom: 2vw;
+  font-size: 2vw;
+}
+
+.itemSection {
+  width: 20vw;
+}
+
+.dataItemContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+}
+
+.dataItemDeleteButton {
+  border: none;
+  font-size: 2vw;
+}
