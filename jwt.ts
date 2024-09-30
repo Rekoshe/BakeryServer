@@ -23,15 +23,28 @@ const strategyOptions: passportJwt.StrategyOptions = {
         const token = req.headers.cookie
             ?.split('; ')
             .find((cookie) => cookie.startsWith('jwt=')); // Adjust 'jwt' to your cookie name
-            
-        return token ? token.split('=')[1] : null; // Extract the token value
+
+        if (token) {
+            return token.split('=')[1]
+        }
+        return null;
+
+        // Extract the token value
     }]),
     secretOrKey: env.JWT_KEY
 }
 
 //this is for extra verification after the token was verified by the user
-const verify : VerifyCallback = function(jwt_payload: CustomJwtPayload, done: VerifiedCallback) {
-    return done(null, false, jwt_payload.username + ' is using the token');
+const verify: VerifyCallback = function (jwtPayload: CustomJwtPayload, done: VerifiedCallback) {
+    try {
+        if (jwtPayload) {
+            return done(null, jwtPayload);
+        }
+        return done(null, false);
+    } catch (error) {
+        return done(error, false);
+    }
+
 }
 
 const jwtStrategy = new Strategy(strategyOptions, verify);
@@ -65,7 +78,7 @@ router.post('/auth', async (req: Request, res: Response, next: NextFunction) => 
         });
 
         res.cookie('jwt', token, { httpOnly: true, secure: false });  // Adjust secure flag for HTTPS
-        res.json({ message: 'Logged in successfully', token });
+        res.json({ message: 'Logged in successfully', token })
 
     })(req, res, next)
 
@@ -73,13 +86,16 @@ router.post('/auth', async (req: Request, res: Response, next: NextFunction) => 
 
 
 //this path can only be accessed if jwt is valid
-router.post('/logOut', (req, res, next) => {
+router.post('/login', (req, res, next) => {
 
-    passport.authenticate('jwt', { session: false }, (err : any, user?: unknown | false, info?: any) => {
-
-        console.log(info);
-        res.clearCookie('jwt');
-        return res.status(200).json({message: 'logged out succesfully'});
+    passport.authenticate('jwt', { session: false }, (err: any, user: CustomJwtPayload | false, info: undefined | Error | { message: string }) => {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return next(err);
+        }
+        return res.status(200).json({ message: 'logged in succesfully' });
     })(req, res, next);
 
     res.status(500);
@@ -105,7 +121,7 @@ router.post('/addUser', async (req, res, next) => {
 
     console.log('user added to db');
 
-    res.status(200).json({message: 'user added successfully'});
+    res.status(200).json({ message: 'user added successfully' });
 
     //return res.status(500);
 })

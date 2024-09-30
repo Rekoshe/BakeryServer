@@ -23,7 +23,7 @@ function logger(req: Request, res: Response, next: NextFunction) {
 
 
 
-app.use(express.static('build'));
+app.use(express.static('docs'));
 app.use(bodyParser.json());
 
 app.use(logger);
