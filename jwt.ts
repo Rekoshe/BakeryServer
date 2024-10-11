@@ -126,6 +126,14 @@ router.post('/addUser', async (req, res, next) => {
     //return res.status(500);
 })
 
+router.post('/logOut', (req, res, next) => {
+    
+
+    res.clearCookie('jwt'); // Adjust the cookie name if necessary
+    console.log("user logged out")
+    return res.status(200).json({ message: 'Logged out successfully' });
+});
+
 export default router;
 
 

@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkbakery_app=self.webpackChunkbakery_app||[]).push([[582],{582:(s,e,t)=>{t.d(e,{worker:()=>k});var o=t(167),a=t(997),p=t(444);const u={username:"dev",bio:"dev bio"},c=[a.L.post("http://3.126.201.133/login",(()=>p.c.json(u,{status:200}))),a.L.post("http://3.126.201.133/logout",(()=>p.c.json({message:"logout successful"},{status:200})))],k=(0,o.k)(...c)}}]);
+//# sourceMappingURL=582.675d16a0.chunk.js.map

@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import authRouter from './auth';
 import jwtRouter from './jwt';
 import { DeleteFromDataSent, InsertIntoDataSent, useDB } from './dbManager';
+import env from './config';
 
 
 
@@ -11,7 +12,7 @@ import { DeleteFromDataSent, InsertIntoDataSent, useDB } from './dbManager';
 const app = express()
 
 
-const port = 4000
+const port = env.PORT;
 
 
 
@@ -68,6 +69,6 @@ function errorHandler(err: Error, req: Request, res: Response, next: NextFunctio
 
 app.use(errorHandler);
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Example app listening on port ${port}`)
 })
